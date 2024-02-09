@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #405DE6;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        #login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #dashboard {
+            display: none;
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #logout-btn {
+            background-color: #405DE6;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #social-feeds {
+            margin-top: 20px;
+        }
+
+        .social-feed {
+            margin-bottom: 20px;
+        }
+
+        .feed-container {
+            margin-top: 10px;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feed-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .feed-item p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Social Media Dashboard</h1>
+    </header>
+
+    <div id="login-container">
+        <h2>Login</h2>
+        <button onclick="login()">Connect Social Media Accounts</button>
+    </div>
+
+    <div id="dashboard">
+        <h2>Welcome, User!</h2>
+        <div id="social-feeds"></div>
+        <button id="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        async function login() {
+            // Simulate a login process
+            // In a real-world scenario, you would use OAuth and platform APIs for authentication
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            // Simulate fetching and displaying social media feeds
+            const instagramFeed = await fetchInstagramFeed();
+            const facebookFeed = await fetchFacebookFeed();
+            const youtubeFeed = await fetchYouTubeFeed();
+
+            displaySocialFeeds(instagramFeed, facebookFeed, youtubeFeed);
+        }
+
+        function logout() {
+            // Implement logout logic here
+            // For simplicity, we just reset the view to the login state
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('social-feeds').innerHTML = '';
+        }
+
+        // Simulated data fetching functions
+        function fetchInstagramFeed() {
+            return new Promise(resolve => {
+                // Simulate fetching data from the Instagram API
+                setTimeout(() => {
+                    const feedData = [
+                        { imageUrl: 'https://via.placeholder.com/150', caption: 'Photo 1' },
+                        { imageUrl: 'https://via.placeholder.com/150', caption: 'Photo 2' },
+                        { imageUrl: 'https://via.placeholder.com/150', caption: 'Photo 3' },
+                    ];
+                    resolve(feedData);
+                }, 1000);
+            });
+        }
+
+        function fetchFacebookFeed() {
+            return new Promise(resolve => {
+                // Simulate fetching data from the Facebook API
+                setTimeout(() => {
+                    const feedData = [
+                        { name: 'John Doe', post: 'Enjoying a day out! #fun', timestamp: '2 hours ago' },
+                        { name: 'Jane Smith', post: 'Excited for the weekend! #weekendvibes', timestamp: '4 hours ago' },
+                    ];
+                    resolve(feedData);
+                }, 1000);
+            });
+        }
+
+        function fetchYouTubeFeed() {
+            return new Promise(resolve => {
+                // Simulate fetching data from the YouTube API
+                setTimeout(() => {
+                    const feedData = [
+                        { title: 'Video 1', thumbnailUrl: 'https://via.placeholder.com/150', views: 1000 },
+                        { title: 'Video 2', thumbnailUrl: 'https://via.placeholder.com/150', views: 2000 },
+                    ];
+                    resolve(feedData);
+                }, 1000);
+            });
+        }
+
+        function displaySocialFeeds(instagramFeed, facebookFeed, youtubeFeed) {
+            const socialFeedsContainer = document.getElementById('social-feeds');
+
+            // Display Instagram feed
+            const instagramContainer = createFeedContainer('Instagram Feed');
+            displayFeed(instagramContainer, instagramFeed);
+
+            // Display Facebook feed
+            const facebookContainer = createFeedContainer('Facebook Feed');
+            displayFeed(facebookContainer, facebookFeed);
+
+            // Display YouTube feed
+            const youtubeContainer = createFeedContainer('YouTube Feed');
+            displayFeed(youtubeContainer, youtubeFeed);
+
+            // Append feed containers to the main container
+            socialFeedsContainer.appendChild(instagramContainer);
+            socialFeedsContainer.appendChild(facebookContainer);
+            socialFeedsContainer.appendChild(youtubeContainer);
+        }
+
+        function createFeedContainer(title) {
+            const container = document.createElement('div');
+            container.className = 'social-feed';
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = title;
+            container.appendChild(titleElement);
+            return container;
+        }
+
+        function displayFeed(container, feed) {
+            const feedContainer = document.createElement('div');
+            feedContainer.className = 'feed-container';
+
+            feed.forEach(item => {
+                const feedItem = document.createElement('div');
+                feedItem.className = 'feed-item';
+                const image = document.createElement('img');
+                const text = document.createElement('p');
+
+                // Common properties for different social media platforms
+                image.src = item.imageUrl || item.thumbnailUrl;
+                text.textContent = item.caption || `${item.name}: ${item.post} (${item.timestamp || item.views} views)`;
+
+                feedItem.appendChild(image);
+                feedItem.appendChild(text);
+                feedContainer.appendChild(feedItem);
+            });
+
+            container.appendChild(feedContainer);
+        }
+    </script>
+</body>
+</html>

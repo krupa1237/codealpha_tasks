@@ -1,0 +1,174 @@
+simple example of an expense tracker using HTML, CSS, and JavaScript. The application allows users to add, edit, and delete expenses, and it uses local storage to persist user data.
+
+html<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        #expense-form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #expenses-list {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .expense-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Expense Tracker</h1>
+    </header>
+
+    <div id="expense-form">
+        <h2>Add Expense</h2>
+        <form id="addExpenseForm">
+            <label for="expenseName">Expense Name:</label>
+            <input type="text" id="expenseName" required>
+
+            <label for="expenseAmount">Expense Amount:</label>
+            <input type="number" id="expenseAmount" required>
+
+            <button type="submit">Add Expense</button>
+        </form>
+    </div>
+
+    <div id="expenses-list">
+        <h2>Expenses</h2>
+        <ul id="expensesUl"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addExpenseForm = document.getElementById('addExpenseForm');
+            const expenseNameInput = document.getElementById('expenseName');
+            const expenseAmountInput = document.getElementById('expenseAmount');
+            const expensesUl = document.getElementById('expensesUl');
+
+            addExpenseForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const expenseName = expenseNameInput.value.trim();
+                const expenseAmount = parseFloat(expenseAmountInput.value);
+
+                if (expenseName !== '' && !isNaN(expenseAmount) && expenseAmount > 0) {
+                    const expenseItem = document.createElement('li');
+                    expenseItem.className = 'expense-item';
+                    expenseItem.innerHTML = `
+                        <span>${expenseName}</span>
+                        <span>$${expenseAmount.toFixed(2)}</span>
+                        <button onclick="editExpense(this)">Edit</button>
+                        <button onclick="deleteExpense(this)">Delete</button>
+                    `;
+
+                    expensesUl.appendChild(expenseItem);
+
+                    // Save data to local storage
+                    saveExpensesToLocalStorage();
+
+                    // Clear form inputs
+                    expenseNameInput.value = '';
+                    expenseAmountInput.value = '';
+                } else {
+                    alert('Please enter valid expense details.');
+                }
+            });
+
+            // Load expenses from local storage on page load
+            loadExpensesFromLocalStorage();
+
+            window.editExpense = function (button) {
+                const expenseItem = button.parentElement;
+                const expenseName = expenseItem.querySelector('span:first-child').textContent;
+                const expenseAmount = parseFloat(expenseItem.querySelector('span:last-child').textContent.replace('$', ''));
+
+                expenseNameInput.value = expenseName;
+                expenseAmountInput.value = expenseAmount;
+
+                // Remove the edited expense from the list
+                expensesUl.removeChild(expenseItem);
+
+                // Save data to local storage after editing
+                saveExpensesToLocalStorage();
+            };
+
+            window.deleteExpense = function (button) {
+                const expenseItem = button.parentElement;
+                expensesUl.removeChild(expenseItem);
+
+                // Save data to local storage after deleting
+                saveExpensesToLocalStorage();
+            };
+
+            function saveExpensesToLocalStorage() {
+                const expenses = Array.from(expensesUl.children).map(item => {
+                    const name = item.querySelector('span:first-child').textContent;
+                    const amount = parseFloat(item.querySelector('span:last-child').textContent.replace('$', ''));
+                    return { name, amount };
+                });
+
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+            }
+
+            function loadExpensesFromLocalStorage() {
+                const storedExpenses = localStorage.getItem('expenses');
+                if (storedExpenses) {
+                    const expenses = JSON.parse(storedExpenses);
+                    expenses.forEach(expense => {
+                        const expenseItem = document.createElement('li');
+                        expenseItem.className = 'expense-item';
+                        expenseItem.innerHTML = `
+                            <span>${expense.name}</span>
+                            <span>$${expense.amount.toFixed(2)}</span>
+                            <button onclick="editExpense(this)">Edit</button>
+                            <button onclick="deleteExpense(this)">Delete</button>
+                        `;
+                        expensesUl.appendChild(expenseItem);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
